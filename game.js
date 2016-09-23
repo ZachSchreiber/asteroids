@@ -3,6 +3,8 @@
 
     var shipElem = document.getElementById('ship');
 
+  var shipObj
+
     // Create your "ship" object and any other variables you might need...
 
 
