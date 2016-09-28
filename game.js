@@ -3,16 +3,26 @@
 
     var shipElem = document.getElementById('ship');
 
-  var shipObj
+    var ship = {
+      velocity: 0,
+      angle: 0,
+      element: document.getElementById("ship")
+    };
+    ship.element.style.top = "300px";
+    ship.element.style.left = "300px";
 
-    // Create your "ship" object and any other variables you might need...
+    var asteroids = [];
+
+//var shipsCurrentAngle = "";
+//var shipsCurrentVelocity = "";
+  // Create your "ship" object and any other variables you might need...
 
 
     var allAsteroids = [];
     shipElem.addEventListener('asteroidDetected', function (event) {
         // You can detect when a new asteroid appears with this event.
         // The new asteroid's HTML element will be in:  event.detail
-
+         asteroids.push(event.detail);
         // What might you need/want to do in here?
 
     });
@@ -32,9 +42,35 @@
     function handleKeys(event) {
         console.log(event.keyCode);
 
-        // Implement me!
+        if (event.keyCode === 38){
+           if (ship.velocity >= 10){
+             ship.velocity = 10;
 
-    }
+           } else {
+           ship.velocity = ship.velocity + 1;
+           }
+         }
+
+         if (event.keyCode === 40){
+           if (ship.velocity <= 0){
+             ship.velocity = 0;
+           } else {
+           ship.velocity = ship.velocity - 1;
+
+           }
+         }
+         if (event.keyCode === 37){
+           ship.angle = ship.angle - 25;
+           ship.element.style.transform = "rotate(" + ship.angle + "deg)";
+
+         }
+         if (event.keyCode === 39){
+           ship.angle = ship.angle + 25;
+           ship.element.style.transform = "rotate(" + ship.angle + "deg)";
+         }
+
+
+      }
     document.querySelector('body').addEventListener('keyup', handleKeys);
 
     /**
@@ -50,14 +86,15 @@
         // NOTE: you will need to change these arguments to match your ship object!
         // What does this function return? What will be in the `move` variable?
         // Read the documentation!
-        var move = getShipMovement(shipsCurrentVelocity, shipsCurrentAngle);
+        var move = getShipMovement(ship.velocity, ship.angle);
 
+        ship.element.style.top = (parseInt(ship.element.style.top) - move.top) + "px";
+        ship.element.style.left = (parseInt(ship.element.style.left) + move.left) + "px";
 
-        // Move the ship here!
-
+      //ship.move.element.style.parseInt(top, 10);
 
         // Time to check for any collisions (see below)...
-        checkForCollisions();
+        checkForCollisions(ship.element.getBoundingClientRect(), asteroids);
     }
 
     /**
@@ -74,11 +111,22 @@
      *
      * @return void
      */
-    function checkForCollisions() {
 
-        // Implement me!
+     //I found the getBoundingReact() method, but didn't know how to use it. Thanks google.
+     function checkForCollisions() {
+      var shipPosition = ship.element.getBoundingClientRect();
 
+      for (var i = 0; i < asteroids.length; i++) {
+        var asteroidPosition = asteroids[i].getBoundingClientRect();
+
+        if (!(asteroidPosition.left >= shipPosition.right||
+          asteroidPosition.right <= shipPosition.left||
+          asteroidPosition.top >= shipPosition.bottom||
+          asteroidPosition.bottom <= shipPosition.top)) {
+            crash(asteroids[i]);
+          }
     }
+  }
 
 
     /**
@@ -87,7 +135,7 @@
      * return {void}
      */
     document.querySelector('main').addEventListener('crash', function () {
-        console.log('A crash occurred!');
+        ship.velocity = 0;
 
         // What might you need/want to do in here?
 
